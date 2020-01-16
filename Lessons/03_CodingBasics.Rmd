@@ -1,0 +1,162 @@
+---
+title: "3: Coding Basics"
+author: "Environmental Data Analytics | Kateri Salk"
+date: "Spring 2020"
+output: pdf_document
+geometry: margin=2.54cm
+editor_options: 
+  chunk_output_type: console
+---
+
+## Objectives
+1. Discuss and navigate different data types in R
+2. Create, manipulate, and explore datasets
+3. Call packages in R
+
+## Data Types in R
+R treats objects differently based on their characteristics. For more information, please see: https://www.statmethods.net/input/datatypes.html. 
+
+* **Vectors** 1 dimensional structure that contains elements of the same type.
+
+* **Matrices** 2 dimensional structure that contains elements of the same type.
+
+* **Arrays** Similar to matrices, but can have more than 2 dimensions. We will not delve into arrays in depth.
+
+* **Lists** Ordered collection of elements that can have different modes.
+
+* **Data Frames** 2 dimensional structure that is more general than a matrix. Columns can have different modes (e.g., numeric and factor). When we import csv files into the R workspace, they will enter as data frames.
+
+Define what each new piece of syntax does below (i.e., fill in blank comments). Note that the R chunk has been divided into sections (# at beginning of line, ---- at end)
+```{r}
+# Vectors ----
+vector1 <- c(1,2,5.3,6,-2,4) # numeric vector
+vector1
+vector2 <- c("one","two","three") # character vector
+vector2
+vector3 <- c(TRUE,TRUE,TRUE,FALSE,TRUE,FALSE) #logical vector
+vector3
+
+vector1[3] # 
+
+# Matrices ----
+matrix1 <- matrix(1:20, nrow = 5,ncol = 4) # 
+matrix1
+matrix2 <- matrix(1:20, nrow = 5, ncol = 4, byrow = TRUE) #
+matrix2
+matrix3 <- matrix(1:20, nrow = 5, ncol = 4, byrow = TRUE, # return after comma continues the line
+                  dimnames = list(c("uno", "dos", "tres", "cuatro", "cinco"), 
+                                  c("un", "deux", "trois", "cat"))) #
+
+matrix1[4, ] #
+matrix1[ , 3] #
+matrix1[c(12, 14)] #
+matrix1[c(12:14)] #
+matrix1[2:4, 1:3] #
+
+cells <- c(1, 26, 24, 68)
+rnames <- c("R1", "R2")
+cnames <- c("C1", "C2") 
+matrix4 <- matrix(cells, nrow = 2, ncol = 2, byrow = TRUE,
+  dimnames = list(rnames, cnames)) # 
+matrix4
+
+# Lists ---- 
+list1 <- list(name = "Maria", mynumbers = vector1, mymatrix = matrix1, age = 5.3); list1
+list1[[2]]
+
+# Data Frames ----
+d <- c(1, 2, 3, 4) # What type of vector?
+e <- c("red", "white", "red", NA) # What type of vector?
+f <- c(TRUE, TRUE, TRUE, FALSE) # What type of vector?
+dataframe1 <- data.frame(d,e,f) #
+names(dataframe1) <- c("ID","Color","Passed"); View(dataframe1) # 
+
+dataframe1[1:2,] # 
+dataframe1[c("ID","Passed")] # 
+dataframe1$ID
+
+```
+Question: How do the different types of data appear in the Environment tab?
+
+> Answer: 
+
+Question: In the R chunk below, write "dataframe1$". Press `tab` after you type the dollar sign. What happens?
+
+> Answer: 
+
+### Coding challenge
+
+Find a ten-day forecast of temperatures (Fahrenheit) for Durham, North Carolina. Create two vectors, one representing the high temperature on each of the ten days and one representing the low.
+
+```{r}
+
+```
+
+Now, create two additional vectors that include the ten-day forecast for the high and low temperatures in Celsius.
+
+```{r}
+
+```
+
+Combine your four vectors into a data frame and add informative column names.
+
+```{r}
+
+```
+
+Use the common functions `summary` and `sd` to obtain basic data summaries of the ten-day forecast. How would you call these functions differently for the entire data frame vs. a single column? Attempt to demonstrate both options below.
+
+```{r}
+
+```
+
+
+## Packages
+
+The Packages tab in the notebook stores the packages that you have saved in your system. A checkmark next to each package indicates whether the package has been loaded into your current R session. Given that R is an open source software, users can create packages that have specific functionalities, with complicated code "packaged" into a simple commands.
+
+If you want to use a specific package that is not in your libaray already, you need to install it. You can do this in two ways: 
+
+1. Click the install button in the packages tab. Type the package name, which should autocomplete below (case matters). Make sure to check "intall dependencies," which will also install packages that your new package uses. 
+
+2. Type `install.packages("packagename")` into your R chunk or console. It will then appear in your packages list. You only need to do this once. 
+
+If a package is already installed, you will need to load it every session. You can do this in two ways: 
+
+1. Click the box next to the package name in the Packages tab. 
+
+2. Type `library(packagename)` into your R chunk or console.
+
+
+```{r}
+# We will use the packages dplyr and ggplot2 regularly. 
+#install.packages("dplyr") 
+#install.packages("ggplot2")
+# comment out install commands, use only when needed and re-comment
+
+library(dplyr)
+library(ggplot2)
+
+# Some packages are umbrellas under which other packages are loaded
+#install.packages("tidyverse")
+library(tidyverse)
+```
+
+Question: What happens in the console when you load a package?
+
+> Answer: 
+
+
+## Tips and Tricks
+
+* Sequential section headers can be created by using at least four -, =, and # characters.
+
+* The command `require(packagename)` will also load a package, but it will not give any error or warning messages if there is an issue.
+
+* You may be asked to restart R when installing or updating packages. Feel free to say no, as this will obviously slow your progress. However, if the functionality of your new package isn't working properly, try restarting R as a first step. 
+
+* If asked "Do you want to install from sources the packages which needs compilation?", type `yes` into the console. 
+
+* You should only install packages once on your machine. If you store `install.packages` in your R chunks/scripts, comment these lines out. 
+
+* Update your packages regularly! 
