@@ -1,0 +1,141 @@
+---
+title: "10: Generalized Linear Models (T-Test)"
+author: "Environmental Data Analytics | Kateri Salk"
+date: "Spring 2020"
+output: pdf_document
+geometry: margin=2.54cm
+editor_options: 
+  chunk_output_type: console
+---
+
+## Objectives
+1. Describe the components of the generalized linear model (GLM)
+2. Apply special cases of the GLM (t-test) to real datasets
+3. Interpret and report the results of t-tests in publication-style formats
+
+## Set up
+```{r, message = FALSE}
+getwd()
+library(tidyverse)
+
+EPAair <- read.csv("./Data/Processed/EPAair_O3_PM25_NC1819_Processed.csv")
+
+# Set date to date format
+EPAair$Date <- as.Date(EPAair$Date, format = "%Y-%m-%d")
+
+# Set theme
+mytheme <- theme_classic(base_size = 14) +
+  theme(axis.text = element_text(color = "black"), 
+        legend.position = "top")
+theme_set(mytheme)
+```
+
+## Generalized Linear Models (GLMs)
+
+The one-sample test (model of the mean), two-sample t-test, analysis of variance (ANOVA), and linear regression are all special cases of the **generalized linear model** (GLM). The GLM also includes analyses not covered in this class, including logistic regression, multinomial regression, chi square, and log-linear models. The common characteristic of general linear models is the expression of a continuous response variable as a linear combination of the effects of categorical or continuous explanatory variables, plus an error term that expresses the random error associated with the coefficients of all explanatory variables. The explanatory variables comprise the deterministic component of the model, and the error term comprises the stochastic component of the model. Historically, artificial distinctions were made between linear models that contained categorical and continuous explanatory variables, but this distinction is no longer made. The inclusion of these models within the umbrella of the GLM allows models to fit the main effects of both categorical and continuous explanatory variables as well as their interactions. 
+
+### Choosing a model from your data: A "cheat sheet"
+
+**T-test:** Continuous response, one categorical explanatory variable with two categories (or comparison to a single value if a one-sample test).
+
+**One-way ANOVA (Analysis of Variance):** Continuous response, one categorical explanatory variable with more than two categories.
+
+**Two-way ANOVA (Analysis of Variance)** Continuous response, two categorical explanatory variables.
+
+**Single Linear Regression** Continuous response, one continuous explanatory variable.
+
+**Multiple Linear Regression** Continuous response, two or more continuous explanatory variables.
+
+**ANCOVA (Analysis of Covariance)** Continuous response, categorical explanatory variable(s) and  continuous explanatory variable(s).
+
+If multiple explanatory variables are chosen, they may be analyzed with respect to their **main effects** on the model (i.e., their separate impacts on the variance explained) or with respsect to their **interaction effects,** the effect of interacting explanatory variables on the model. 
+
+### Assumptions of the GLM
+
+The GLM is based on the assumption that the data residuals approximate a normal distribution (or a linearly transformed normal distribution). We will discuss the non-parametric analogues to several of these tests if the assumptions of normality are violated. For tests that analyze categorical explanatory variables, the assumption is that the variance in the response variable is equal among groups. Note: environmental data often violate the assumptions of normality and equal variance, and we will often proceed with a GLM even if these assumptions are violated. In this situation, justifying the decision to proceed with a linear model must be made. 
+
+## T-Test
+### One-sample t-test
+The object of a one sample test is to test the null hypothesis that the mean of the group is equal to a specific value. For example, we might ask ourselves (from the EPA air quality processed dataset): 
+
+Are Ozone levels below the threshold for "good" AQI index (0-50)?
+
+```{r}
+
+summary(EPAair$Ozone)
+EPAair.subsample <- sample_n(EPAair, 5000)
+
+# Evaluate assumption of normal distribution
+shapiro.test((EPAair.subsample$Ozone))
+ggplot(EPAair, aes(x = Ozone)) +
+  geom_histogram() 
+qqnorm(EPAair$Ozone); qqline(EPAair$Ozone)
+
+O3.onesample <- t.test(EPAair$Ozone, mu = 50, alternative = "less")
+O3.onesample
+
+Ozone.plot <- ggplot(EPAair, aes(x = Ozone)) +
+  #geom_density(stat = "count", fill = "gray") +
+  geom_density(fill = "gray") +
+  geom_vline(xintercept = 50, color = "#238b45", lty = 2, size = 0.9) +
+  scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0))
+print(Ozone.plot)
+```
+
+Write a sentence or two about the results of this test. Include both the results of the test and an interpretation that puts the findings in context of the resarch question.
+
+> 
+
+### Two-sample t-test
+The two-sample *t* test is used to test the hypothesis that the mean of two samples is equivalent. Unlike the one-sample tests, a two-sample test requires a second assumption that the variance of the two groups is equivalent. Are Ozone levels different between 2018 and 2019?
+
+```{r}
+shapiro.test(EPAair$Ozone[EPAair$Year == 2018])
+shapiro.test(EPAair$Ozone[EPAair$Year == 2019])
+var.test(EPAair$Ozone ~ EPAair$Year)
+
+ggplot(EPAair, aes(x = Ozone, color = as.factor(Year))) +
+  geom_freqpoly()
+
+# Format as a t-test
+O3.twosample <- t.test(EPAair$Ozone ~ EPAair$Year)
+O3.twosample
+O3.twosample$p.value
+
+# Format as a GLM
+O3.twosample2 <- lm(EPAair$Ozone ~ EPAair$Year)
+summary(O3.twosample2)
+
+plot(O3.twosample2)
+```
+
+### Non-parametric equivalent of t-test: Wilcoxon test
+
+When we wish to avoid the assumption of normality, we can apply *distribution-free*, or non-parametric, methods in the form of the Wilcoxon rank sum (Mann-Whitney) test. The Wilcoxon test replaces the data by their rank and calculates the sum of the ranks for each group. Notice that the output of the Wilcoxon test is more limited than its parametric equivalent.
+
+```{r}
+O3.onesample.wilcox <- wilcox.test(EPAair$Ozone, mu = 50, alternative = "less")
+O3.onesample.wilcox
+O3.twosample.wilcox <- wilcox.test(EPAair$Ozone ~ EPAair$Year)
+O3.twosample.wilcox
+```
+
+### Visualization and interpretation challenge
+
+Create three plots, each with appropriately formatted axes and legends. Choose a non-default color palette.
+
+1. geom_density of ozone divided by year (distinguish between years by adding transparency to the geom_density layer).
+2. geom_boxplot of ozone divided by year . Add letters representing a significant difference between 2018 and 2019 (hint: stat_summary). 
+3. geom_violin of ozone divided by year, with the 0.5 quantile marked as a horizontal line. Add letters representing a significant difference between 2018 and 2019. 
+
+```{r}
+
+
+```
+
+Now, write a summary of your findings, incorporating statistical output, reference to the figure(s), and a contextual interpretation.
+
+> 
+
+
+
