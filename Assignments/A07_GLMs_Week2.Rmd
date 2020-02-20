@@ -1,0 +1,101 @@
+---
+title: "Assignment 7: GLMs week 2 (Linear Regression and beyond)"
+author: "Student Name"
+output: pdf_document
+geometry: margin=2.54cm
+editor_options: 
+  chunk_output_type: console
+---
+
+## OVERVIEW
+
+This exercise accompanies the lessons in Environmental Data Analytics on generalized linear models. 
+
+## Directions
+1. Change "Student Name" on line 3 (above) with your name.
+3. Work through the steps, **creating code and output** that fulfill each instruction.
+4. Be sure to **answer the questions** in this assignment document.
+6. When you have completed the assignment, **Knit** the text and code into a single PDF file.
+8. After Knitting, submit the completed exercise (PDF file) to the dropbox in Sakai. Add your last name into the file name (e.g., "Salk_A06_GLMs_Week1.Rmd") prior to submission.
+
+The completed exercise is due on Tuesday, February 25 at 1:00 pm.
+
+## Set up your session 
+1. Set up your session. Check your working directory, load the tidyverse, nlme, and piecewiseSEM packages, import the *raw* NTL-LTER raw data file for chemistry/physics, and import the processed litter dataset. You will not work with dates, so no need to format your date columns this time.
+
+2. Build a ggplot theme and set it as your default theme.
+
+```{r}
+#1
+
+
+#2
+
+```
+
+
+## NTL-LTER test
+Research question: What is the best set of predictors for lake temperatures in July across the monitoring period at the North Temperate Lakes LTER? 
+
+3. Wrangle your NTL-LTER dataset with a pipe function so that it contains only the following criteria: 
+
+* Only dates in July (hint: use the daynum column). No need to consider leap years.
+* Only the columns: lakename, year4, daynum, depth, temperature_C
+* Only complete cases (i.e., remove NAs)
+
+4. Run an AIC to determine what set of explanatory variables (year4, daynum, depth) is best suited to predict temperature. Run a multiple regression on the recommended set of variables. 
+
+```{r}
+#3
+
+
+#4
+
+```
+
+5. What is the final set of explanatory variables that predict temperature from your multiple regression? How much of the observed variance does this model explain?
+
+> Answer: 
+
+6. Run an interaction effects ANCOVA to predict temperature based on depth and lakename from the same wrangled dataset.
+
+```{r}
+#6
+
+```
+
+7. Is there a significant interaction between depth and lakename? How much variance in the temperature observations does this explain?
+
+> Answer: 
+
+8. Create a graph that depicts temperature by depth, with a separate color for each lake. Add a geom_smooth (method = "lm", se = FALSE) for each lake. Make your points 50 % transparent. Adjust your y axis limits to go from 0 to 35 degrees. Clean up your graph to make it pretty. 
+
+```{r}
+#8
+
+```
+
+9. Run a mixed effects model to predict dry mass of litter. We already know that nlcdClass and functionalGroup have a significant interaction, so we will specify those two variables as fixed effects with an interaction. We also know that litter mass varies across plot ID, but we are less interested in the actual effect of the plot itself but rather in accounting for the variance among plots. Plot ID will be our random effect.
+
+a. Build and run a mixed effects model.
+b. Check the difference between the marginal and conditional R2 of the model. 
+
+```{r}
+
+
+```
+
+b. continued... How much more variance is explained by adding the random effect to the model? 
+
+> Answer: 2 %
+
+c. Run the same model without the random effect.
+d. Run an anova on the two tests. 
+```{r}
+ 
+
+```
+
+d. continued... Is the mixed effects model a better model than the fixed effects model? How do you know?
+
+> Answer: 

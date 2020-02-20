@@ -1,0 +1,130 @@
+---
+title: "13: Generalized Linear Models (ANCOVA and mixed effects)"
+author: "Environmental Data Analytics | Kateri Salk"
+date: "Spring 2020"
+output: pdf_document
+geometry: margin=2.54cm
+editor_options: 
+  chunk_output_type: console
+---
+
+## Objectives
+2. Apply special cases of the GLM (ANCOVA, mixed effects models) to real datasets
+3. Interpret and report the results of linear regressions in publication-style formats
+3. Apply model selection methods to choose model formulations
+
+## Set up
+```{r, message = FALSE}
+getwd()
+library(tidyverse)
+library(lubridate)
+library(viridis)
+#install.packages("nlme")
+library(nlme)
+#install.packages("piecewiseSEM")
+library(piecewiseSEM)
+
+PeterPaul.chem.nutrients <- read.csv("./Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv")
+NTL.chem <- read.csv("./Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv")
+
+NTL.chem$sampledate <- as.Date(NTL.chem$sampledate, format = "%m/%d/%y")
+
+# Set theme
+mytheme <- theme_classic(base_size = 14) +
+  theme(axis.text = element_text(color = "black"), 
+        legend.position = "top")
+theme_set(mytheme)
+```
+
+## ANCOVA
+Analysis of Covariance consists of a prediction of a continuous response variable by both continuous and categorical explanatory variables. We set this up in R with the `lm` function, just like prior applications in this lesson. 
+
+Let's say we wanted to predict total nitrogen concentrations by depth and by lake. We could represent these explanatory variables as main effects (two intercepts, same slope) or as interaction effects (two intercepts and two slopes). 
+
+```{r, fig.height = 3, fig.width = 4}
+# main effects
+TNancova.main <- lm(data = PeterPaul.chem.nutrients, tn_ug ~ lakename + depth)
+summary(TNancova.main)
+
+# interaction effects
+TNancova.interaction <- lm(data = PeterPaul.chem.nutrients, tn_ug ~ lakename * depth)
+summary(TNancova.interaction)
+
+TNplot <- ggplot(PeterPaul.chem.nutrients, aes(x = depth, y = tn_ug, color = lakename)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE) +
+  xlim(0, 10)
+print(TNplot)
+
+# Make the graph attractive
+```
+
+## HIERARCHICAL MODELS
+
+**Hierarchical models,** or **mixed-effects models,** are a type of linear model in which explanatory variables are given a model whose parameters are also estimated by the data. The coefficients associated with explanatory variables thus may not be a single value but instead be sampled from a distribution, called the hyper-distribution, which is defined by the modeler. The advantage of the hierarchical model is that it builds capacity to describe multiple layers of stochasticity, which enables accounting of all aspects of uncertainty in a system. Specifically, we can separately model the process of interest and the sampling process. 
+
+The coefficients of a hierarchical model are divided into two categories: **fixed effects** and **random effects.** A **fixed effect** is a factor whose levels are experimentally determined or whose interest lies in the effects of each level (e.g., covariates, treatments, interactions). A **random effect** is a factor whose levels are sampled from a larger population, or whose interest lies in the variation among them rather than the specific effect of each level. In choosing whether you are dealing with a fixed or a random effect, consider the following questions: 
+
+  + Do you have a particular interest in the studied factor level?
+
+  + Have you included all possible levels in the study?
+  
+  + Do you have interest in the variance among levels?
+  
+  + Do you have interest in generalizing to factor levels that you did not study?
+  
+A common variable in hierarchical models is **space.** In many situations, we may want to infer conditions beyond the sites that we have sampled. By treating space as a random variable, we may be able to extrapolate conditions of the response variable across a spatial gradient. 
+
+Let's think about the situation of temperature monitoring in the NTL-LTER lakes. We might be interested to know whether surface temperatures in July have increased over time in response to climate change. However, we know that there may be variability across lakes that may obscure the trend we see in temperature. We can set lake as a random effect to account for the across-lake variability and also enable us to extrapolate across lakes in northern Wisconsin.
+
+Let's wrangle our data and visualize a preliminary relationship between our variables of interest.
+
+```{r}
+NTL.summertemp <- 
+  NTL.chem %>%
+  select(lakename:temperature_C) %>%
+  #filter for Julian days in July and surface measurements
+  filter(daynum > 181 & daynum < 213 & depth == 0 ) %>%
+  #code won't work if there are NAs
+  na.exclude()
+
+NTLtemps <-
+ggplot(NTL.summertemp, aes(x = sampledate, y = temperature_C, color = lakename)) +
+  geom_point() +
+  scale_color_viridis_d()
+print(NTLtemps)
+```
+
+Next, we will build a hierarchical model. We will use the package `nlme` for our analyses. Another good package for running hierarchical, or mixed-effects, models is `lme4`. For the basic types of hierarchical models, these packages have about the same functionality. We will set year year (continuous) as a fixed effect and lake (categorical) as a random effect. Remember that we are interested in assessing if summer surface temperatures have increased in response to climate change and to account for the inter-lake variability within the model.
+
+
+```{r}
+TempTest.mixed <- lme(data = NTL.summertemp,
+                     temperature_C ~ year4, 
+                     random = ~1|lakename)
+summary(TempTest.mixed)
+rsquared(TempTest.mixed)
+
+# Compare the random effects model with the fixed effects model
+TempTest.fixed <- gls(data = NTL.summertemp,
+                      temperature_C ~ year4)
+summary(TempTest.fixed)
+
+anova(TempTest.mixed, TempTest.fixed)
+# The lower the AIC, the better.
+# The p-value tells us whether those models have a significantly different fit
+
+NTL.tempmodel <-
+ggplot(NTL.summertemp, aes(x = year4, y = temperature_C, color = lakename)) +
+  geom_point() +
+  scale_color_viridis_d() +
+  geom_abline(intercept = -97.72, slope = 0.06) +
+  # make it look better
+  labs(x = "", y = expression("Temperature " ( degree~C)), color = "") +
+  theme(legend.spacing.x = unit(0, "cm"))
+print(NTL.tempmodel)
+```
+
+Question: How would you interpret the collective results of your mixed effects model in the context of the study question?
+
+> ANSWER: 
