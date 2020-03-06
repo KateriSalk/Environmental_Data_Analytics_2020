@@ -1,0 +1,41 @@
+---
+title: "Assignment 9: Spatial Analysis"
+author: "Student Name"
+output: pdf_document
+geometry: margin=2.54cm
+editor_options: 
+  chunk_output_type: console
+---
+
+## OVERVIEW
+
+This exercise accompanies the lessons in Environmental Data Analytics on spatial analysis. 
+
+## Directions
+1. Use this document to create code for a map. You will **NOT** be turning in the knitted Rmd file this time, only the pdf output for a map.
+2. When you have produced your output, submit **only** the pdf file for the map, without any code. Please name your file "StudentName_A09_Spatial.pdf".
+
+The completed exercise is due on Thursday, March 19 at 1:00 pm.
+
+## Create a map
+
+You have three options for this assignment, and you will turn in just **one** final product. Feel free to choose the option that will be most beneficial to you. For all options, to earn full points you should use best practices for data visualization that we have covered in previous assignments (e.g., relabeling axes and legends, choosing non-default color palettes, etc.).
+
+Here are your three options: 
+
+1. Reproduce figure 1b from the spatial lesson, found in section 3.2.2. You may choose a state other than North Carolina, but your map should still contain the spatial features contained in figure 1b in the "img" folder. 
+
+2. Create a new map that mixes spatial and tabular data, as in section 3.3 of the spatial lesson. You may use the maps created in the lesson as an example, but your map should contain data other than precipitation days per year. This map should include: 
+
+* State boundary layer
+* Basin boundary layer
+* Gage layer
+* Tabular data (as an aesthetic for one of the layers)
+
+3. Create a map of any other spatial data. This could be data from the spatial lesson, data from our other course datasets (e.g., the Litter dataset includes latitude and longitude of trap sites), or another dataset of your choosing.  Your map should include: 
+
+* One or more layers with polygon features (e.g., country boundaries, watersheds)
+* One or more layers with point and/or line features (e.g., sampling sites, roads)
+* Tabular data that correpond to one of the layers, specified as an aesthetic (e.g., total litter biomass at each trap, land cover class at each trap)
+
+Hint: One package that may come in handy here is the `maps` package, which contains several options for basemaps that cover political and geologic boundaries.
