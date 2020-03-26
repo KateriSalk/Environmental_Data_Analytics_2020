@@ -1,0 +1,116 @@
+---
+title: "Assignment 10: Data Scraping"
+author: "Student Name"
+output: pdf_document
+geometry: margin=2.54cm
+editor_options: 
+  chunk_output_type: console
+---
+
+# Total points:
+
+## OVERVIEW
+
+This exercise accompanies the lessons in Environmental Data Analytics on time series analysis. 
+
+## Directions
+1. Change "Student Name" on line 3 (above) with your name.
+3. Work through the steps, **creating code and output** that fulfill each instruction.
+4. Be sure to **answer the questions** in this assignment document.
+6. When you have completed the assignment, **Knit** the text and code into a single PDF file.
+8. After Knitting, submit the completed exercise (PDF file) to the dropbox in Sakai. Add your last name into the file name (e.g., "Salk_A06_GLMs_Week1.Rmd") prior to submission.
+
+The completed exercise is due on Tuesday, April 7 at 1:00 pm.
+
+## Set up 
+1. Set up your session:
+
+* Check your working directory
+* Load the packages `tidyverse`, `rvest`, and any others you end up using.
+* Set your ggplot theme
+
+```{r, message = FALSE}
+
+
+```
+
+2. Indicate the EPA impaired waters website (https://www.epa.gov/nutrient-policy-data/waters-assessed-impaired-due-nutrient-related-causes) as the URL to be scraped. 
+
+```{r}
+
+
+```
+
+3. Scrape the Rivers table, with every column except year. Then, turn it into a data frame.
+
+```{r}
+
+State <- 
+Rivers.Assessed.mi2 <- 
+Rivers.Assessed.percent <- 
+Rivers.Impaired.mi2 <- 
+Rivers.Impaired.percent <- 
+Rivers.Impaired.percent.TMDL <- 
+
+Rivers <- 
+```
+
+4. Use `str_replace` to remove non-numeric characters from the numeric columns. 
+
+5. Set the numeric columns to a numeric class and verify this using `str`.
+
+```{r}
+# 4
+
+
+# 5
+
+
+```
+
+6. Scrape the Lakes table, with every column except year. Then, turn it into a data frame.
+
+```{r}
+State <- 
+Lakes.Assessed.mi2 <- 
+Lakes.Assessed.percent <- 
+Lakes.Impaired.mi2 <- 
+Lakes.Impaired.percent <- 
+Lakes.Impaired.percent.TMDL <- 
+
+Lakes <- 
+```
+
+7. Filter out the states with no data. 
+
+8. Use `str_replace` to remove non-numeric characters from the numeric columns. 
+
+9. Set the numeric columns to a numeric class and verify this using `str`.
+```{r}
+# 7
+
+
+# 8
+
+
+# 9
+
+
+```
+
+10. Join the two data frames with a `full_join`.
+
+```{r}
+
+```
+
+11. Create one graph that compares the data for lakes and/or rivers. This option is flexible; choose a relationship (or relationships) that seem interesting to you, and think about the implications of your findings. This graph should be edited so it follows best data visualization practices. 
+
+(You may choose to run a statistical test or add a line of best fit; this is optional but may aid in your interpretations)
+```{r}
+
+```
+
+12. Summarize the findings that accompany your graph. You may choose to suggest further research or data collection to help explain the results.
+
+>
